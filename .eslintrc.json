@@ -33,6 +33,7 @@
   "rules": {
     "linebreak-style": "off",
     "comma-dangle": ["error", "only-multiline"],
+    "no-param-reassign": ["error", { "props": true, "ignorePropertyModificationsFor": ["state"] }],
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/ban-types": [
       "error",
@@ -70,7 +71,8 @@
         "ts": "never",
         "tsx": "never"
       }
-    ]
+    ],
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
   },
   "root": true
 }

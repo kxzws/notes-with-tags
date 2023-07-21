@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
-// import walletReducer from './wallet/slices';
+import notesReducer from './notes/slices';
 
 const rootReducer = combineReducers({
-  // wallet: walletReducer,
+  notes: notesReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
