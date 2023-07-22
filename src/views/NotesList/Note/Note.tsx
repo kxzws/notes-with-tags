@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Button, CardActions } from '@mui/material';
+import { CardActions } from '@mui/material';
 import { Delete } from '@mui/icons-material';
+import parseHTML from 'html-react-parser';
 
 import { Note } from '../../../utils/types';
 import { notesSlice } from '../../../redux/notes/slices';
@@ -12,7 +13,6 @@ interface NoteProps {
 }
 
 export const NoteItem = ({ note }: NoteProps) => {
-  const [isEdit, setIsEdit] = useState<boolean>(false);
   const [textareaValue, setTextareaValue] = useState<string>(note.text);
 
   const { updateNote, deleteNote } = notesSlice.actions;
@@ -23,19 +23,17 @@ export const NoteItem = ({ note }: NoteProps) => {
     dispatch(deleteNote(note));
   };
 
-  const onTextClick = (e: React.MouseEvent<HTMLParagraphElement, MouseEvent>) => {
-    e.preventDefault();
-    setIsEdit(true);
-  };
-
   const onTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextareaValue(e.target.value);
   };
 
-  const onSaveClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const onTextareaBlur = (e: React.FocusEvent<HTMLTextAreaElement, Element>) => {
     e.preventDefault();
-    dispatch(updateNote({ ...note, text: textareaValue }));
-    setIsEdit(false);
+
+    const tags = Array.from(
+      new Set(textareaValue.split(' ').filter((word) => word[0] === '#' && word.length > 1))
+    );
+    dispatch(updateNote({ ...note, text: textareaValue, tags }));
   };
 
   return (
@@ -48,23 +46,34 @@ export const NoteItem = ({ note }: NoteProps) => {
       </CardActions>
 
       <styled.NoteContent>
-        {isEdit ? (
-          <styled.EditContainer>
-            <styled.NoteTextarea
-              value={textareaValue}
-              maxRows={20}
-              onChange={onTextareaChange}
-              autoFocus
-            />
-            <Button variant="outlined" size="small" onClick={onSaveClick}>
-              Save
-            </Button>
-          </styled.EditContainer>
-        ) : (
-          <styled.Text onClick={onTextClick}>{note.text}</styled.Text>
-        )}
+        <styled.TextareaContainer>
+          <styled.NoteTextarea
+            value={textareaValue}
+            onChange={onTextareaChange}
+            onBlur={onTextareaBlur}
+          />
+          <styled.TextareaOutput>
+            {parseHTML(
+              textareaValue
+                .split(' ')
+                .map((word) => {
+                  if (word[0] === '#') {
+                    return `<span style="color: blue;">${word}</span>`;
+                  }
+                  return word;
+                })
+                .join(' ')
+            )}
+          </styled.TextareaOutput>
+        </styled.TextareaContainer>
+
         <hr />
-        <p>{note.tags}</p>
+
+        <styled.TagContainer>
+          {note.tags.map((tag, ind) => (
+            <styled.Tag key={`${tag}-${ind + 1}`}>{tag}</styled.Tag>
+          ))}
+        </styled.TagContainer>
       </styled.NoteContent>
     </styled.Note>
   );

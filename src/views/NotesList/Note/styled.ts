@@ -18,19 +18,45 @@ export const IdText = styled('p')`
   font-weight: bold;
 `;
 
-export const Text = styled('p')`
-  margin: 4px 0 16px;
-  word-break: break-word;
-  white-space: pre-line;
+export const TextareaContainer = styled('div')`
+  height: fit-content;
+  width: 100%;
+  position: relative;
 `;
 
-export const EditContainer = styled('div')`
-  display: flex;
-  flex-direction: column;
-  row-gap: 12px;
+export const TextareaOutput = styled('div')`
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  word-break: break-word;
+  pointer-events: none;
 `;
 
 export const NoteTextarea = styled(TextareaAutosize)`
-  padding: 4px 2px;
+  padding: 0;
+  width: 100%;
+  position: relative;
+  z-index: 0;
   font: inherit;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+
+  &:not([value='']) {
+    -webkit-text-fill-color: transparent;
+  }
+`;
+
+export const TagContainer = styled('p')`
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 4px;
+  word-break: break-word;
+`;
+
+export const Tag = styled('span')`
+  color: blue;
 `;
