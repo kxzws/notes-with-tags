@@ -1,4 +1,4 @@
-import { styled, Button } from '@mui/material';
+import { styled, Button, FormControl } from '@mui/material';
 
 import { CenterContainer } from '../../styled/CenterContainer';
 
@@ -23,4 +23,8 @@ export const AddButton = styled(Button)`
   font-size: inherit;
   text-transform: none;
   border-radius: 8px;
+`;
+
+export const FilterForm = styled(FormControl)`
+  width: 160px;
 `;
