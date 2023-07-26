@@ -34,7 +34,7 @@ export const Header = ({ notes }: HeaderProps) => {
 
   const onAddClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    db.notes.add({ id: uuidv4(), text: 'New note #hi', tags: ['#hi'] });
+    db.notes.add({ id: uuidv4(), title: 'Title', text: 'New note #hi', tags: ['#hi'] });
   };
 
   const onFilterChange = (e: SelectChangeEvent<string[]>) => {

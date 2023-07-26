@@ -18,6 +18,14 @@ export const IdText = styled('p')`
   font-weight: bold;
 `;
 
+export const NoteTitleInput = styled('input')`
+  margin-bottom: 16px;
+  padding: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border: none;
+`;
+
 export const TextareaContainer = styled('div')`
   height: fit-content;
   width: 100%;

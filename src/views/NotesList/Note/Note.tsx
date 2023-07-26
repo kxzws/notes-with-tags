@@ -12,14 +12,25 @@ interface NoteProps {
 }
 
 export const NoteItem = ({ note }: NoteProps) => {
+  const [titleInputValue, setTitleInputValue] = useState<string>(note.title);
   const [textareaValue, setTextareaValue] = useState<string>(note.text);
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const inputTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const textAreaTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (inputTimeoutRef.current) clearTimeout(inputTimeoutRef.current);
+    if (note.title !== titleInputValue) {
+      inputTimeoutRef.current = setTimeout(() => {
+        db.notes.put({ ...note, title: titleInputValue });
+      }, 700);
+    }
+  }, [titleInputValue]);
+
+  useEffect(() => {
+    if (textAreaTimeoutRef.current) clearTimeout(textAreaTimeoutRef.current);
     if (note.text !== textareaValue) {
-      timeoutRef.current = setTimeout(() => {
+      textAreaTimeoutRef.current = setTimeout(() => {
         const tags = Array.from(
           new Set(textareaValue.split(' ').filter((word) => word[0] === '#' && word.length > 1))
         );
@@ -33,7 +44,13 @@ export const NoteItem = ({ note }: NoteProps) => {
     db.notes.delete(note.id);
   };
 
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setTitleInputValue(e.target.value);
+  };
+
   const onTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
     setTextareaValue(e.target.value);
   };
 
@@ -47,6 +64,8 @@ export const NoteItem = ({ note }: NoteProps) => {
       </CardActions>
 
       <styled.NoteContent>
+        <styled.NoteTitleInput type="text" value={titleInputValue} onChange={onInputChange} />
+
         <styled.TextareaContainer>
           <styled.NoteTextarea value={textareaValue} onChange={onTextareaChange} />
           <styled.TextareaOutput>
@@ -54,7 +73,7 @@ export const NoteItem = ({ note }: NoteProps) => {
               textareaValue
                 .split(' ')
                 .map((word) => {
-                  if (word[0] === '#') {
+                  if (word[0] === '#' && word.length > 1) {
                     return `<span style="color: blue;">${word}</span>`;
                   }
                   return word;
