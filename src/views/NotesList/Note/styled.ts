@@ -39,6 +39,7 @@ export const TextareaOutput = styled('div')`
   left: 0;
   z-index: 1;
   word-break: break-word;
+  white-space: pre-line;
   pointer-events: none;
 `;
 
