@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { notesSlice } from '../../redux/notes/slices';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import useTypedSelector from '../../hooks/useTypedSelector';
+import { Note } from '../../utils/types';
 import { NoteItem } from './Note/Note';
 import * as styled from './styled';
 
@@ -10,13 +11,17 @@ const breakpointColumnsObj = {
   default: 3,
 };
 
-export const NotesList = () => {
-  const { notes, filteredNotes } = useTypedSelector((state) => state.notes);
+interface NoteListProps {
+  notes?: Note[];
+}
+
+export const NotesList = ({ notes }: NoteListProps) => {
+  const { filteredNotes } = useTypedSelector((state) => state.notes);
   const { updateFilteredNotes } = notesSlice.actions;
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (notes.length) dispatch(updateFilteredNotes());
+    dispatch(updateFilteredNotes(notes || []));
   }, [notes]);
 
   return (

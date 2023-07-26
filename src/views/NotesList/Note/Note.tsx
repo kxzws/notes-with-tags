@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CardActions } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import parseHTML from 'html-react-parser';
 
+import { db } from '../../../db';
 import { Note } from '../../../utils/types';
-import { notesSlice } from '../../../redux/notes/slices';
-import useAppDispatch from '../../../hooks/useAppDispatch';
 import * as styled from './styled';
 
 interface NoteProps {
@@ -15,25 +14,27 @@ interface NoteProps {
 export const NoteItem = ({ note }: NoteProps) => {
   const [textareaValue, setTextareaValue] = useState<string>(note.text);
 
-  const { updateNote, deleteNote } = notesSlice.actions;
-  const dispatch = useAppDispatch();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (note.text !== textareaValue) {
+      timeoutRef.current = setTimeout(() => {
+        const tags = Array.from(
+          new Set(textareaValue.split(' ').filter((word) => word[0] === '#' && word.length > 1))
+        );
+        db.notes.put({ ...note, text: textareaValue, tags });
+      }, 700);
+    }
+  }, [textareaValue]);
 
   const onDeleteClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    dispatch(deleteNote(note));
+    db.notes.delete(note.id);
   };
 
   const onTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextareaValue(e.target.value);
-  };
-
-  const onTextareaBlur = (e: React.FocusEvent<HTMLTextAreaElement, Element>) => {
-    e.preventDefault();
-
-    const tags = Array.from(
-      new Set(textareaValue.split(' ').filter((word) => word[0] === '#' && word.length > 1))
-    );
-    dispatch(updateNote({ ...note, text: textareaValue, tags }));
   };
 
   return (
@@ -47,11 +48,7 @@ export const NoteItem = ({ note }: NoteProps) => {
 
       <styled.NoteContent>
         <styled.TextareaContainer>
-          <styled.NoteTextarea
-            value={textareaValue}
-            onChange={onTextareaChange}
-            onBlur={onTextareaBlur}
-          />
+          <styled.NoteTextarea value={textareaValue} onChange={onTextareaChange} />
           <styled.TextareaOutput>
             {parseHTML(
               textareaValue

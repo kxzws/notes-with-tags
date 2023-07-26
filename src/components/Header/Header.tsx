@@ -10,14 +10,20 @@ import {
 import { Add } from '@mui/icons-material';
 import { v4 as uuidv4 } from 'uuid';
 
+import { db } from '../../db';
 import { notesSlice } from '../../redux/notes/slices';
 import useAppDispatch from '../../hooks/useAppDispatch';
 import useTypedSelector from '../../hooks/useTypedSelector';
+import { Note } from '../../utils/types';
 import * as styled from './styled';
 
-export const Header = () => {
+interface HeaderProps {
+  notes?: Note[];
+}
+
+export const Header = ({ notes }: HeaderProps) => {
   const { filterList, selectedFilterValues } = useTypedSelector((state) => state.notes);
-  const { addNote, setSelectedFilterValues } = notesSlice.actions;
+  const { updateFilteredNotes, setSelectedFilterValues } = notesSlice.actions;
   const dispatch = useAppDispatch();
 
   const [selectedFilters, setSelectedFilters] = useState<string[]>(selectedFilterValues);
@@ -28,7 +34,7 @@ export const Header = () => {
 
   const onAddClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    dispatch(addNote({ id: uuidv4(), text: 'New note #hi', tags: ['#hi'] }));
+    db.notes.add({ id: uuidv4(), text: 'New note #hi', tags: ['#hi'] });
   };
 
   const onFilterChange = (e: SelectChangeEvent<string[]>) => {
@@ -40,6 +46,7 @@ export const Header = () => {
         typeof e.target.value === 'string' ? e.target.value.split(' ') : e.target.value
       )
     );
+    dispatch(updateFilteredNotes(notes || []));
   };
 
   return (
